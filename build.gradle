@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id 'io.freefair.lombok' version '8.6'
+}
+
+group = 'by.senla.test.lobacevich'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    manifest {
+        attributes('Main-Class': 'by.senla.task.lobacevich.runner.Main',
+                'name': project.name, 'version': version)
+    }
+}
