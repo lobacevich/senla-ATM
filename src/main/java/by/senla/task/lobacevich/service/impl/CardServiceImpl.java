@@ -17,6 +17,7 @@ import lombok.Getter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public class CardServiceImpl implements CardService {
 
@@ -68,7 +69,8 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public void createCard(String cardNumber, String pinCode) throws CardDublicateException {
-        if (getCards().stream().filter(x -> x.getNumber().equals(cardNumber)).findFirst().get() != null) {
+        Optional<Card> optCard = getCards().stream().filter(x -> x.getNumber().equals(cardNumber)).findFirst();
+        if (optCard.isPresent()) {
             throw new CardDublicateException("Карта с номером " + cardNumber + " уже существует");
         }
         Card card = Card.builder()

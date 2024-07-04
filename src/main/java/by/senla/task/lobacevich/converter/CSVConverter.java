@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ public class CSVConverter {
     private static final CSVConverter INSTANCE = new CSVConverter();
     private static final String ATM_PATH = "/ATM.csv";
     private static final String CARDS_PATH = "/cards.csv";
-    private static final Path WRITE_PATH = Paths.get(System.getProperty("user.home"));
 
     private CSVConverter() {
     }
