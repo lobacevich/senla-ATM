@@ -1,6 +1,7 @@
 package by.senla.task.lobacevich.ui;
 
 import by.senla.task.lobacevich.entity.Card;
+import by.senla.task.lobacevich.exception.CardDublicateException;
 import by.senla.task.lobacevich.exception.CardIsBlockedException;
 import by.senla.task.lobacevich.exception.CardNotFoundException;
 import by.senla.task.lobacevich.exception.DepositLimitException;
@@ -20,7 +21,6 @@ public class Builder {
     private final Menu cardMenu = new Menu("Выберете действие", new ArrayList<>());
     private final ConsoleProcessor console = ConsoleProcessor.getINSTANCE();
     private final CardService cardService = CardServiceImpl.getINSTANCE();
-//    private final ATMService atmService = ATMServiceImpl.getINSTANCE();
     private final Navigator navigator = Navigator.getINSTANCE();
 
     private Builder() {
@@ -41,13 +41,17 @@ public class Builder {
         }, cardMenu);
         rootMenu.addItem(useCard);
 
-        MenuItem newCard = new MenuItem("выпустить новую карточку", () -> {
+        MenuItem newCard = new MenuItem("Выпустить новую карточку", () -> {
             System.out.println("Придумайте номер карты(формат ХХХХ-ХХХХ-ХХХХ-ХХХХ)");
             String cardNumber = console.getCardNumberInput();
             System.out.println("Придумайте пин код(4 цифры)");
             String pinCode = console.getPinCodeInput();
-            cardService.createCard(cardNumber, pinCode);
-            System.out.println("Карта " + cardNumber + " успешно выпущена");
+            try {
+                cardService.createCard(cardNumber, pinCode);
+                System.out.println("Карта " + cardNumber + " успешно выпущена");
+            } catch (CardDublicateException e) {
+                System.out.println(e.getMessage());
+            }
         }, rootMenu);
         rootMenu.addItem(newCard);
     }
@@ -91,7 +95,8 @@ public class Builder {
         }, cardMenu);
         cardMenu.addItem(depositMoney);
 
-        MenuItem toRootMenu = new MenuItem("В главное меню", () -> {}, rootMenu);
+        MenuItem toRootMenu = new MenuItem("В главное меню", () -> {
+        }, rootMenu);
         cardMenu.addItem(toRootMenu);
     }
 }
