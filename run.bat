@@ -1,0 +1,1 @@
+java -jar ./build/libs/senlaATM-1.0.jar
