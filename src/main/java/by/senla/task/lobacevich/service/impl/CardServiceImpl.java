@@ -2,15 +2,11 @@ package by.senla.task.lobacevich.service.impl;
 
 import by.senla.task.lobacevich.dao.CardDao;
 import by.senla.task.lobacevich.dao.impl.CardDaoImpl;
-import by.senla.task.lobacevich.entity.ATM;
 import by.senla.task.lobacevich.entity.Card;
 import by.senla.task.lobacevich.exception.CSVConvertException;
-import by.senla.task.lobacevich.exception.CardDublicateException;
+import by.senla.task.lobacevich.exception.CardInsufficientFundsException;
 import by.senla.task.lobacevich.exception.CardIsBlockedException;
 import by.senla.task.lobacevich.exception.CardNotFoundException;
-import by.senla.task.lobacevich.exception.DepositLimitException;
-import by.senla.task.lobacevich.exception.NotEnoughtMoneyException;
-import by.senla.task.lobacevich.service.ATMService;
 import by.senla.task.lobacevich.service.CardService;
 import lombok.Getter;
 
@@ -22,32 +18,15 @@ import java.util.Optional;
 public class CardServiceImpl implements CardService {
 
     @Getter
-    private static final CardServiceImpl INSTANCE = new CardServiceImpl();
-    private static final Integer DEPOSIT_LIMIT = 1000000;
+    private static final CardService INSTANCE = new CardServiceImpl();
     private final CardDao cardDao = CardDaoImpl.getINSTANCE();
-    private final ATMService atmService = ATMServiceImpl.getINSTANCE();
 
     private CardServiceImpl() {
     }
 
     @Override
-    public int getBalance(Card card) {
-        return card.getBalance();
-    }
-
-    @Override
-    public Card getCard(String cardNumber) throws CardNotFoundException, CardIsBlockedException {
-        Card card = cardDao.getCardByNumber(cardNumber);
-        if (card.isBlocked()) {
-            if (card.getTimeCardWasBlocked().isBefore(LocalDateTime.now().minusDays(1))) {
-                card.setBlocked(false);
-            } else {
-                throw new CardIsBlockedException("карта " + cardNumber +
-                        " заблокирована. Автоматическая разблокировка " +
-                        card.getTimeCardWasBlocked().plusDays(1L));
-            }
-        }
-        return card;
+    public Card getCard(String cardNumber) throws CardNotFoundException {
+        return cardDao.getCardByNumber(cardNumber);
     }
 
     @Override
@@ -68,11 +47,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void createCard(String cardNumber, String pinCode) throws CardDublicateException {
-        Optional<Card> optCard = getCards().stream().filter(x -> x.getNumber().equals(cardNumber)).findFirst();
-        if (optCard.isPresent()) {
-            throw new CardDublicateException("Карта с номером " + cardNumber + " уже существует");
-        }
+    public void createCard(String cardNumber, String pinCode) {
         Card card = Card.builder()
                 .number(cardNumber)
                 .pin(pinCode)
@@ -84,28 +59,23 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void withdrawMoney(Card card, int sum) throws NotEnoughtMoneyException {
-        ATM atm = atmService.getATM();
-        if (card.getBalance() >= sum && atm.getBalance() >=sum) {
+    public boolean checkCardExists(String cardNumber) {
+        Optional<Card> optCard = getCards().stream().filter(x -> x.getNumber().equals(cardNumber)).findFirst();
+        return optCard.isPresent();
+    }
+
+    @Override
+    public void withdrawMoney(Card card, int sum) throws CardInsufficientFundsException {
+        if (card.getBalance() >= sum) {
             card.setBalance(card.getBalance() - sum);
-            atm.setBalance(atm.getBalance() - sum);
-        } else if (card.getBalance() < sum){
-            throw new NotEnoughtMoneyException("На карте недостаточно средств для вывода");
         } else {
-            throw new NotEnoughtMoneyException("В банкомате недостаточно средств для вывода. Осталось " +
-                    atm.getBalance());
+            throw new CardInsufficientFundsException("На карте не достаточно средств для вывода");
         }
     }
 
     @Override
-    public void depositMoney(Card card, int sum) throws DepositLimitException {
-        ATM atm = atmService.getATM();
-        if (sum <= DEPOSIT_LIMIT) {
+    public void depositMoney(Card card, int sum) {
             card.setBalance(card.getBalance() + sum);
-            atm.setBalance(atm.getBalance() - sum);
-        } else {
-            throw new DepositLimitException("Превышен лимит пополнения карты. Максимльная сумма пополнения " + DEPOSIT_LIMIT);
-        }
     }
 
     @Override

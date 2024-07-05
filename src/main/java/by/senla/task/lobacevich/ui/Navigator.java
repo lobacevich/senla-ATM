@@ -30,7 +30,9 @@ public class Navigator {
         }
         MenuItem item = currentMenu.getMenuItems().get(index - 1);
         item.doAction();
-        setCurrentMenu(item.getNextMenu());
+        if (item.getNextMenu() != null) {
+            setCurrentMenu(item.getNextMenu());
+        }
         return true;
     }
 }

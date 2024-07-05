@@ -1,6 +1,6 @@
 package by.senla.task.lobacevich.service;
 
-import by.senla.task.lobacevich.entity.ATM;
+import by.senla.task.lobacevich.exception.AtmInsufficientFundsException;
 
 public interface ATMService {
 
@@ -8,5 +8,7 @@ public interface ATMService {
 
     void writeATM();
 
-    ATM getATM();
+    void withdrawMoney(int sum) throws AtmInsufficientFundsException;
+
+    void depositMoney(int sum);
 }

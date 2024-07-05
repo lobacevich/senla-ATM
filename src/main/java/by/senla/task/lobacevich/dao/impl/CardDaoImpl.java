@@ -14,7 +14,7 @@ import java.util.List;
 public class CardDaoImpl implements CardDao {
 
     @Getter
-    private static final CardDaoImpl INSTANCE = new CardDaoImpl();
+    private static final CardDao INSTANCE = new CardDaoImpl();
     private final CSVConverter converter = CSVConverter.getINSTANCE();
     private final List<Card> cards = new ArrayList<>();
 

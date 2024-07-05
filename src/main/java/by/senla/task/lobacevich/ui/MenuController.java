@@ -14,7 +14,6 @@ public class MenuController {
     }
 
     public void run() {
-        builder.buildRootMenu();
         navigator.setCurrentMenu(builder.getRootMenu());
         boolean flag = true;
         while (flag) {
@@ -23,7 +22,7 @@ public class MenuController {
             try {
                 flag = navigator.navigate(index);
             } catch (IndexOutOfBoundsException e) {
-                System.out.println("Неверный ввод, попробуйте еще раз");
+                System.out.println("Вы ввели недопустимое значение, попробуйте еще раз");
             }
         }
     }

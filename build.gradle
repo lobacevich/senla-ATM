@@ -15,10 +15,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
-//tasks.withType(JavaCompile).configureEach {
-//    options.encoding = 'UTF-8'
-//}
-
 jar {
     manifest {
         attributes('Main-Class': 'by.senla.task.lobacevich.runner.Main',

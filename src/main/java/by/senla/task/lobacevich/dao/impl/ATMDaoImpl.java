@@ -10,7 +10,7 @@ import java.io.IOException;
 public class ATMDaoImpl implements ATMDao {
 
     @Getter
-    private static final ATMDaoImpl INSTANCE = new ATMDaoImpl();
+    private static final ATMDao INSTANCE = new ATMDaoImpl();
     private final CSVConverter converter = CSVConverter.getINSTANCE();
     private ATM atm;
 
